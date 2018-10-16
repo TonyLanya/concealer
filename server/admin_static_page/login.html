@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Concealer Admin - Login</title>
+
+    <link rel="shortcut icon" type="image/png" href="imgs/favicon.png"/>
+    <!-- Bootstrap core CSS-->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin.css" rel="stylesheet">
+
+  </head>
+
+  <body class="bg-dark">
+
+    <div class="container">
+      <div class="card card-login mx-auto mt-5">
+        <div class="card-header">Login</div>
+        <div class="card-body">
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="text" id="inputUsername" class="form-control" placeholder="UserName" required="required" autofocus="autofocus">
+                <label for="inputUsername">UserName</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="form-label-group">
+                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required="required">
+                <label for="inputPassword">Password</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" value="remember-me">
+                  Remember Password
+                </label>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-block" id="btnLogin">Login</button>
+          <div class="text-center">
+            <!--<a class="d-block small mt-3" href="register.html">Register an Account</a>-->
+            <!--<a class="d-block small" href="forgot-password.html">Forgot Password?</a>-->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <script>
+      var getUrlParameter = function getUrlParameter(sParam) {
+          var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+              sURLVariables = sPageURL.split('&'),
+              sParameterName,
+              i;
+
+          for (i = 0; i < sURLVariables.length; i++) {
+              sParameterName = sURLVariables[i].split('=');
+
+              if (sParameterName[0] === sParam) {
+                  return sParameterName[1] === undefined ? true : sParameterName[1];
+              }
+          }
+      };
+      $("#btnLogin").click(function() {
+          preusername = $("#inputUsername").val();
+          prepassword = $("#inputPassword").val();
+          console.log(getUrlParameter("next"));
+          if (getUrlParameter("next")) {
+              prenext = getUrlParameter("next");
+          } else {
+              prenext = "index.html";
+          }
+          $.ajax({
+            /* the route pointing to the post function */
+              url: 'http://concealer.ngrok.xiaomiqiu.cn/api/user/login',
+              type: 'POST',
+            /* send the csrf-token and the input to the controller */
+              data: {
+                username: preusername,
+                  password: prepassword
+              },
+              dataType: "JSON", // and this
+              success: function (msg) {
+                  if ( msg["code"] == 0 ) {
+                      localStorage.setItem("token", msg["data"]["token"]);
+                      localStorage.setItem("name", msg["data"]["name"]);
+                      localStorage.setItem("is_admin", msg["data"]["is_admin"]);
+                      window.location = "" + prenext;
+                  }
+                  //do something
+              },
+              error: function (errormessage) {
+                  console.log(errormessage);
+                  if (errormessage["responseJSON"]["code"] == 1) {
+                      window.location = "login.html?next=" + prenext;
+                  }
+                  //do something else
+              }
+          });
+      });
+    </script>
+
+  </body>
+
+</html>
